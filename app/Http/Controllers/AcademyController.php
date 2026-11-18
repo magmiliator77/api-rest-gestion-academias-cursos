@@ -43,20 +43,43 @@ class AcademyController extends Controller
         return response()->json($academy);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
+    // PUT /api/academies/{id}: modifica la academia, solo si es del usuario
     public function update(Request $request, string $id)
     {
-        //
+        $academy = Academy::find($id);
+
+        if (! $academy) {
+            return response()->json(['message' => 'Academia no encontrada'], 404);
+        }
+
+        // 403 Forbidden: el usuario tiene token pero la academia no es suya
+        if ($academy->user_id != $request->user()->id) {
+            return response()->json(['message' => 'No puedes modificar una academia que no es tuya'], 403);
+        }
+
+        $data = $request->validate($this->rules());
+        $academy->update($data);
+
+        return response()->json($academy);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
+    // DELETE /api/academies/{id}: borra la academia, solo si es del usuario
+    public function destroy(Request $request, string $id)
     {
-        //
+        $academy = Academy::find($id);
+
+        if (! $academy) {
+            return response()->json(['message' => 'Academia no encontrada'], 404);
+        }
+
+        if ($academy->user_id != $request->user()->id) {
+            return response()->json(['message' => 'No puedes borrar una academia que no es tuya'], 403);
+        }
+
+        // Al borrarla se borran también sus cursos (onDelete cascade en la migración)
+        $academy->delete();
+
+        return response()->json(['message' => 'Academia borrada']);
     }
 
     // Reglas de validación de una academia

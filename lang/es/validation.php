@@ -9,7 +9,7 @@ return [
     'date' => 'El campo :attribute no es una fecha válida.',
     'email' => 'El campo :attribute debe ser un correo válido.',
     'unique' => 'Ya existe un registro con ese :attribute.',
-    'exists' => 'El :attribute elegido no existe.',
+    'exists' => 'El valor de :attribute no existe.',
     'after_or_equal' => 'El campo :attribute debe ser una fecha igual o posterior a :date.',
     'before' => 'El campo :attribute debe ser una fecha anterior a :date.',
     'max' => [

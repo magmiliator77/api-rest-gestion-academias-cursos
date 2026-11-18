@@ -44,20 +44,49 @@ class CourseController extends Controller
         return response()->json($course);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
+    // PUT /api/courses/{id}: modifica el curso, solo si es de una academia del usuario
     public function update(Request $request, string $id)
     {
-        //
+        $course = Course::find($id);
+
+        if (! $course) {
+            return response()->json(['message' => 'Curso no encontrado'], 404);
+        }
+
+        // El dueño del curso es el dueño de su academia
+        if ($course->academy->user_id != $request->user()->id) {
+            return response()->json(['message' => 'No puedes modificar un curso de una academia que no es tuya'], 403);
+        }
+
+        $data = $request->validate($this->rules());
+
+        // Si se cambia el curso de academia, la nueva también tiene que ser suya
+        $newAcademy = Academy::find($data['academy_id']);
+        if ($newAcademy->user_id != $request->user()->id) {
+            return response()->json(['message' => 'Solo puedes pasar el curso a una de tus academias'], 403);
+        }
+
+        $course->update($data);
+
+        return response()->json($course);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
+    // DELETE /api/courses/{id}: borra el curso, solo si es de una academia del usuario
+    public function destroy(Request $request, string $id)
     {
-        //
+        $course = Course::find($id);
+
+        if (! $course) {
+            return response()->json(['message' => 'Curso no encontrado'], 404);
+        }
+
+        if ($course->academy->user_id != $request->user()->id) {
+            return response()->json(['message' => 'No puedes borrar un curso de una academia que no es tuya'], 403);
+        }
+
+        $course->delete();
+
+        return response()->json(['message' => 'Curso borrado']);
     }
 
     // Reglas de validación de un curso

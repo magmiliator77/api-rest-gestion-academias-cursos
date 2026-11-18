@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AcademyController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CourseController;
 use Illuminate\Support\Facades\Route;
 
 // Todas las rutas de este archivo empiezan por /api
@@ -14,6 +15,7 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
 
-    // Las 5 rutas REST (index, store, show, update, destroy) de las academias
+    // Las 5 rutas REST (index, store, show, update, destroy) de cada recurso
     Route::apiResource('academies', AcademyController::class);
+    Route::apiResource('courses', CourseController::class);
 });

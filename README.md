@@ -34,3 +34,20 @@ Relaciones: un usuario tiene muchas academias (1:N), una academia tiene muchos c
 | POST | /api/register | No | Crea el usuario y devuelve su token | 201, o 422 si los datos no son válidos |
 | POST | /api/login | No | Comprueba email y contraseña y devuelve un token | 200, o 401 si no coinciden |
 | POST | /api/logout | Sí | Borra el token con el que se hace la petición | 200, o 401 sin token |
+
+### Academias y cursos (CRUD con `apiResource`)
+
+Todas necesitan token (401 sin él). Cualquier usuario puede ver todas las academias y cursos, pero solo el dueño puede modificarlos o borrarlos (403 si no es suyo). Un curso es del dueño de su academia.
+
+| Método | Ruta | Qué hace | Respuesta |
+|---|---|---|---|
+| GET | /api/academies | Lista todas las academias | 200 |
+| POST | /api/academies | Crea una academia del usuario | 201, o 422 |
+| GET | /api/academies/{id} | Muestra una academia | 200, o 404 |
+| PUT | /api/academies/{id} | Modifica una academia propia | 200, 403, 404 o 422 |
+| DELETE | /api/academies/{id} | Borra una academia propia y sus cursos | 200, 403 o 404 |
+| GET | /api/courses | Lista todos los cursos | 200 |
+| POST | /api/courses | Crea un curso en una academia propia | 201, 403 o 422 |
+| GET | /api/courses/{id} | Muestra un curso | 200, o 404 |
+| PUT | /api/courses/{id} | Modifica un curso de una academia propia | 200, 403, 404 o 422 |
+| DELETE | /api/courses/{id} | Borra un curso de una academia propia | 200, 403 o 404 |

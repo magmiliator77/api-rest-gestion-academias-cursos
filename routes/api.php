@@ -11,6 +11,9 @@ use Illuminate\Support\Facades\Route;
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
+// Ruta no-REST para ver los cursos de una academia: también es pública
+Route::get('/academy/{academy}/courses', [AcademyController::class, 'courses']);
+
 // Rutas que necesitan la cabecera Authorization: Bearer <token>
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);

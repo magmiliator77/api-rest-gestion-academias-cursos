@@ -82,6 +82,20 @@ class AcademyController extends Controller
         return response()->json(['message' => 'Academia borrada']);
     }
 
+    // GET /api/academy/{id}/courses: los cursos de una academia (ruta pública, sin token)
+    public function courses(string $id)
+    {
+        $academy = Academy::find($id);
+
+        if (! $academy) {
+            return response()->json(['message' => 'Academia no encontrada'], 404);
+        }
+
+        // $academy->courses usa la relación hasMany del modelo Academy:
+        // Laravel busca en la tabla courses las filas con academy_id = id de esta academia
+        return response()->json($academy->courses);
+    }
+
     // Reglas de validación de una academia
     private function rules()
     {

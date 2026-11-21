@@ -145,6 +145,34 @@ class CourseController extends Controller
         ], 201);
     }
 
+    // DELETE /api/courses/{course}/unenroll/{student}: quita a un estudiante del curso
+    public function unenroll(Request $request, string $courseId, string $studentId)
+    {
+        $course = Course::find($courseId);
+        if (! $course) {
+            return response()->json(['message' => 'Curso no encontrado'], 404);
+        }
+
+        $student = Student::find($studentId);
+        if (! $student) {
+            return response()->json(['message' => 'Estudiante no encontrado'], 404);
+        }
+
+        if ($course->academy->user_id != $request->user()->id) {
+            return response()->json(['message' => 'Solo puedes desmatricular en cursos de tus academias'], 403);
+        }
+
+        // 404 si el estudiante no está en este curso: no hay matrícula que borrar
+        if (! $course->students()->where('student_id', $student->id)->exists()) {
+            return response()->json(['message' => 'El estudiante no está matriculado en este curso'], 404);
+        }
+
+        // detach es lo contrario de attach: borra la fila de la tabla pivote
+        $course->students()->detach($student->id);
+
+        return response()->json(['message' => 'Estudiante desmatriculado']);
+    }
+
     // Reglas de validación de un curso
     private function rules()
     {

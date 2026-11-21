@@ -122,6 +122,17 @@ class CourseController extends Controller
             return response()->json(['message' => 'Solo puedes matricular en cursos de tus academias'], 403);
         }
 
+        // 409 Conflict: la petición choca con lo que ya hay en la base de datos.
+        // Sin esta comprobación, la clave única (course_id, student_id) de la tabla pivote daría un error 500
+        if ($course->students()->where('student_id', $student->id)->exists()) {
+            return response()->json(['message' => 'El estudiante ya está matriculado en este curso'], 409);
+        }
+
+        // Si ya hay tantos matriculados como plazas, el curso está lleno
+        if ($course->students()->count() >= $course->capacity) {
+            return response()->json(['message' => 'El curso no tiene plazas libres'], 409);
+        }
+
         // attach añade una fila en la tabla pivote course_student (course_id, student_id)
         // y en el segundo parámetro le paso el dato extra de la tabla: la fecha de matrícula
         $course->students()->attach($student->id, ['enrolled_at' => now()]);

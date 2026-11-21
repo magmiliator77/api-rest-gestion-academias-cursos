@@ -21,4 +21,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Las 5 rutas REST (index, store, show, update, destroy) de cada recurso
     Route::apiResource('academies', AcademyController::class);
     Route::apiResource('courses', CourseController::class);
+
+    // Rutas no-REST de la relación N:N entre cursos y estudiantes
+    Route::get('/course/{course}/students', [CourseController::class, 'students']);
 });

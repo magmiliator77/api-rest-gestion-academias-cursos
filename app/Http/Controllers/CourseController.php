@@ -89,6 +89,20 @@ class CourseController extends Controller
         return response()->json(['message' => 'Curso borrado']);
     }
 
+    // GET /api/course/{id}/students: los estudiantes matriculados en un curso (con token)
+    public function students(string $id)
+    {
+        $course = Course::find($id);
+
+        if (! $course) {
+            return response()->json(['message' => 'Curso no encontrado'], 404);
+        }
+
+        // $course->students usa la relación belongsToMany (N:N) a través de la tabla course_student.
+        // Cada estudiante sale con "pivot", que trae la fecha de matrícula (enrolled_at)
+        return response()->json($course->students);
+    }
+
     // Reglas de validación de un curso
     private function rules()
     {

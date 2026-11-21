@@ -24,4 +24,5 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Rutas no-REST de la relación N:N entre cursos y estudiantes
     Route::get('/course/{course}/students', [CourseController::class, 'students']);
+    Route::post('/courses/{course}/enroll/{student}', [CourseController::class, 'enroll']);
 });

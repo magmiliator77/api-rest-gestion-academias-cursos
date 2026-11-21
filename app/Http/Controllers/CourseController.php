@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Academy;
 use App\Models\Course;
+use App\Models\Student;
 use Illuminate\Http\Request;
 
 class CourseController extends Controller
@@ -101,6 +102,36 @@ class CourseController extends Controller
         // $course->students usa la relación belongsToMany (N:N) a través de la tabla course_student.
         // Cada estudiante sale con "pivot", que trae la fecha de matrícula (enrolled_at)
         return response()->json($course->students);
+    }
+
+    // POST /api/courses/{course}/enroll/{student}: matricula a un estudiante en el curso
+    public function enroll(Request $request, string $courseId, string $studentId)
+    {
+        $course = Course::find($courseId);
+        if (! $course) {
+            return response()->json(['message' => 'Curso no encontrado'], 404);
+        }
+
+        $student = Student::find($studentId);
+        if (! $student) {
+            return response()->json(['message' => 'Estudiante no encontrado'], 404);
+        }
+
+        // Solo el dueño de la academia donde se imparte el curso puede matricular
+        if ($course->academy->user_id != $request->user()->id) {
+            return response()->json(['message' => 'Solo puedes matricular en cursos de tus academias'], 403);
+        }
+
+        // attach añade una fila en la tabla pivote course_student (course_id, student_id)
+        // y en el segundo parámetro le paso el dato extra de la tabla: la fecha de matrícula
+        $course->students()->attach($student->id, ['enrolled_at' => now()]);
+
+        // 201 Created porque se crea una matrícula nueva
+        return response()->json([
+            'message' => 'Estudiante matriculado',
+            'course' => $course->name,
+            'student' => $student->name . ' ' . $student->surname,
+        ], 201);
     }
 
     // Reglas de validación de un curso
